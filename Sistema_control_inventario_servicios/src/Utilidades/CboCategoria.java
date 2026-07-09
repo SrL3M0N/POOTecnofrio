@@ -1,0 +1,32 @@
+package Utilidades;
+
+public class CboCategoria {
+	private int idCategoria;
+    private String nombre;
+
+    public CboCategoria(int idCategoria, String nombre) {
+        this.idCategoria = idCategoria;
+        this.nombre = nombre;
+    }
+	public int getIdCategoria() {
+		return idCategoria;
+	}
+
+	public void setIdCategoria(int idCategoria) {
+		this.idCategoria = idCategoria;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+    
+	// ESTO ES LO QUE SE VE EN EL COMBOBOX
+    @Override
+    public String toString() {
+        return this.nombre; 
+    }
+}
