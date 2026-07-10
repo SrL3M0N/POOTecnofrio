@@ -165,45 +165,45 @@ public class FormCliente extends JFrame {
 			btnLimpiar.setBounds(30, 347, 240, 23);
 			contentPane.add(btnLimpiar);
 		}
-			{
-				scrollPane = new JScrollPane();
-				scrollPane.setBounds(308, 45, 466, 257);
-				contentPane.add(scrollPane);
-				table = new JTable();
-				table.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						do_table_mouseClicked(e);
-					}
-				});
-				scrollPane.setViewportView(table);
-				table.setModel(new javax.swing.table.DefaultTableModel(
-					    new Object [][] {},
-					    new String [] {
-					        "ID",
-					        "Nombres",
-					        "Apellidos",
-					        "Teléfono",
-					        "Email",
-					        "Documento"
-					    }
-					));
-				table.getColumnModel().getColumn(0).setMinWidth(0);
-				table.getColumnModel().getColumn(0).setMaxWidth(0);
-				table.getColumnModel().getColumn(0).setWidth(0);
-				table.getColumnModel().getColumn(0).setPreferredWidth(0);
-				
-				table.getColumnModel().getColumn(4).setPreferredWidth(100);//
-			}
+		{
+			scrollPane = new JScrollPane();
+			scrollPane.setBounds(308, 45, 466, 257);
+			contentPane.add(scrollPane);
+			table = new JTable();
+			table.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					do_table_mouseClicked(e);
+				}
+			});
+			scrollPane.setViewportView(table);
+			
+			// CORREGIDO: Modelo de tabla no editable que fuerza la reactividad visual
+			table.setModel(new javax.swing.table.DefaultTableModel(
+				new Object [][] {},
+				new String [] { "ID", "Nombres", "Apellidos", "Teléfono", "Email", "Documento" }
+			) {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+			});
+			
+			table.getColumnModel().getColumn(0).setMinWidth(0);
+			table.getColumnModel().getColumn(0).setMaxWidth(0);
+			table.getColumnModel().getColumn(0).setWidth(0);
+			table.getColumnModel().getColumn(0).setPreferredWidth(0);
+			table.getColumnModel().getColumn(4).setPreferredWidth(100);
+		}
 		listarClientes();
 		setLocationRelativeTo(null);
 	}
+	
 	//METODOS 
 	public void eliminarCliente() {
-
 	    if (idCliente == 0) {
-	        JOptionPane.showMessageDialog(null,
-	                "Seleccione un cliente");
+	        JOptionPane.showMessageDialog(null, "Seleccione un cliente");
 	        return;
 	    }
 
@@ -214,22 +214,14 @@ public class FormCliente extends JFrame {
 	            JOptionPane.YES_NO_OPTION);
 
 	    if (respuesta == JOptionPane.YES_OPTION) {
-
 	        ClienteDAO dao = new ClienteDAO();
-
 	        if (dao.eliminarCliente(idCliente)) {
-
-	            JOptionPane.showMessageDialog(null,
-	                    "Cliente eliminado correctamente");
-
+	            JOptionPane.showMessageDialog(null, "Cliente eliminado correctamente");
 	            listarClientes();
 	            limpiarCampos();
 	            idCliente = 0;
-
 	        } else {
-
-	            JOptionPane.showMessageDialog(null,
-	                    "No se pudo eliminar");
+	            JOptionPane.showMessageDialog(null, "No se pudo eliminar");
 	        }
 	    }
 	}
@@ -240,21 +232,17 @@ public class FormCliente extends JFrame {
 	    txtTelefono.setText("");
 	    txtEmail.setText("");
 	    txtDocumento.setText("");
-
 	    txtNombres.requestFocus();
 	}
 	
 	public void listarClientes() {
-
 	    ClienteDAO dao = new ClienteDAO();
-
-	    DefaultTableModel modelo =
-	            (DefaultTableModel) table.getModel();
+	    DefaultTableModel modelo = (DefaultTableModel) table.getModel();
 	    
-	    // Limpiar la tabla
+	    // Limpiar la tabla por completo
 	    modelo.setRowCount(0);
+	    
 	    for (Cliente c : dao.listarClientes()) {
-
 	        Object fila[] = {
 	            c.getIdCliente(),
 	            c.getNombres(),
@@ -263,16 +251,13 @@ public class FormCliente extends JFrame {
 	            c.getEmail(),
 	            c.getDocumento()
 	        };
-
 	        modelo.addRow(fila);
 	    }
 	}
+	
 	public void modificarCliente() {
-		
-
 	    if (idCliente == 0) {
-	        JOptionPane.showMessageDialog(null,
-	                "Seleccione un cliente");
+	        JOptionPane.showMessageDialog(null, "Seleccione un cliente");
 	        return;
 	    }
 	    
@@ -280,33 +265,25 @@ public class FormCliente extends JFrame {
 	        return;
 	    }
 
-
 	    Cliente cliente = new Cliente();
-
 	    cliente.setIdCliente(idCliente);
-	    cliente.setNombres(txtNombres.getText());
-	    cliente.setApellidos(txtApellidos.getText());
-	    cliente.setTelefono(txtTelefono.getText());
-	    cliente.setEmail(txtEmail.getText());
-	    cliente.setDocumento(txtDocumento.getText());
+	    cliente.setNombres(txtNombres.getText().trim());
+	    cliente.setApellidos(txtApellidos.getText().trim());
+	    cliente.setTelefono(txtTelefono.getText().trim());
+	    cliente.setEmail(txtEmail.getText().trim());
+	    cliente.setDocumento(txtDocumento.getText().trim());
 
 	    ClienteDAO dao = new ClienteDAO();
-
 	    if (dao.modificarCliente(cliente)) {
-
-	        JOptionPane.showMessageDialog(null,
-	                "Cliente modificado correctamente");
-
+	        JOptionPane.showMessageDialog(null, "Cliente modified correctamente");
 	        listarClientes();
 	        limpiarCampos();
 	        idCliente = 0;
-
 	    } else {
-
-	        JOptionPane.showMessageDialog(null,
-	                "Error al modificar");
+	        JOptionPane.showMessageDialog(null, "Error al modificar");
 	    }
 	}
+	
 	//GUARDAR
 	protected void do_btnNewButton_actionPerformed(ActionEvent e) {
 	    if (!validarCamposCliente()) {
@@ -314,54 +291,47 @@ public class FormCliente extends JFrame {
 	    }
 
 	    Cliente cliente = new Cliente();
-	    cliente.setNombres(txtNombres.getText());
-	    cliente.setApellidos(txtApellidos.getText());
-	    cliente.setTelefono(txtTelefono.getText());
-	    cliente.setEmail(txtEmail.getText());
-	    cliente.setDocumento(txtDocumento.getText());
+	    cliente.setNombres(txtNombres.getText().trim());
+	    cliente.setApellidos(txtApellidos.getText().trim());
+	    cliente.setTelefono(txtTelefono.getText().trim());
+	    cliente.setEmail(txtEmail.getText().trim());
+	    cliente.setDocumento(txtDocumento.getText().trim());
 
 	    ClienteDAO dao = new ClienteDAO();
-
 	    if (dao.registrarCliente(cliente)) {
-
-	        JOptionPane.showMessageDialog(this,
-	                "Cliente registrado correctamente");
-
-	        listarClientes();
+	        JOptionPane.showMessageDialog(this, "Cliente registrado correctamente");
+	        listarClientes(); // Refresca la tabla visual inmediatamente
 	        limpiarCampos();
-
 	    } else {
-
-	        JOptionPane.showMessageDialog(this,
-	                "El cliente ya fue registrado");
+	        JOptionPane.showMessageDialog(this, "El cliente ya fue registrado");
 	    }
 	}
+	
 	protected void do_table_mouseClicked(MouseEvent e) {
 	    int fila = table.getSelectedRow();
-
-	    idCliente = Integer.parseInt(
-	        table.getValueAt(fila, 0).toString()
-	    );
-	    
-        txtNombres.setText(table.getValueAt(fila, 1).toString());
-        txtApellidos.setText(table.getValueAt(fila, 2).toString());
-        txtTelefono.setText(table.getValueAt(fila, 3).toString());
-        txtEmail.setText(table.getValueAt(fila, 4).toString());
-        txtDocumento.setText(table.getValueAt(fila, 5).toString());
+	    if (fila >= 0) {
+		    idCliente = Integer.parseInt(table.getValueAt(fila, 0).toString());
+	        txtNombres.setText(table.getValueAt(fila, 1).toString());
+	        txtApellidos.setText(table.getValueAt(fila, 2).toString());
+	        txtTelefono.setText(table.getValueAt(fila, 3).toString());
+	        txtEmail.setText(table.getValueAt(fila, 4).toString());
+	        txtDocumento.setText(table.getValueAt(fila, 5).toString());
+	    }
 	}
+	
 	protected void do_btnLimpiar_actionPerformed(ActionEvent e) {
 		  limpiarCampos();
 	}
-	//MODIFICAR 
+	
 	protected void do_btnModificar_actionPerformed(ActionEvent e) {
 		modificarCliente();
 	}
+	
 	protected void do_btnEliminar_actionPerformed(ActionEvent e) {
 	     eliminarCliente();
 	}
 	
 	private boolean validarCamposCliente() {
-
 	    String nombres = txtNombres.getText().trim();
 	    String apellidos = txtApellidos.getText().trim();
 	    String telefono = txtTelefono.getText().trim();

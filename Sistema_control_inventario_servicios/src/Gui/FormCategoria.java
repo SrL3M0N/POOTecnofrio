@@ -110,8 +110,8 @@ public class FormCategoria extends JDialog {
 		}
 		{
 
-			cboEstado = new JComboBox();
-			cboEstado.setModel(new DefaultComboBoxModel(new String[] {"Activo", "Inactivo"}));
+			cboEstado = new JComboBox<String>();
+			cboEstado.setModel(new DefaultComboBoxModel<String>(new String[] {"Activo", "Inactivo"}));
 			cboEstado.setBounds(123, 147, 214, 22);
 			getContentPane().add(cboEstado);
 		}
@@ -157,17 +157,23 @@ public class FormCategoria extends JDialog {
 	
 	//GUARDAR
 	protected void do_btnNewButton_actionPerformed(ActionEvent e) {
-		//Es valido tener letras y numeros en el nombre de la categoria. 
 		String nombre = txtNombre.getText().trim();
 	    String descripcion = txtDescripcion.getText().trim();
 	    int estadoBit = (cboEstado.getSelectedIndex() == 0) ? 1 : 0;
-	    // 1. Validación básica
+	    
+	    // 1. Validación básica de vacío
 	    if (nombre.isEmpty()) {
-	        JOptionPane.showMessageDialog(null, "El nombre es obligatorio.");
+	        JOptionPane.showMessageDialog(null, "El nombre de la categoría es obligatorio.", "Validación", JOptionPane.WARNING_MESSAGE);
 	        txtNombre.requestFocus();
 	        return;
 	    }
 	    
+	    // 🔥 CORRECCIÓN: Validación para que NO sea puro número ni símbolos especiales
+	    if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+	        JOptionPane.showMessageDialog(null, "El nombre de la categoría solo puede contener letras y espacios.", "Validación", JOptionPane.WARNING_MESSAGE);
+	        txtNombre.requestFocus();
+	        return;
+	    }
 	    
 	    // 2. Verificación de duplicados
 	    String sqlVerificar = "SELECT COUNT(*) FROM Categoria_Producto WHERE nombre = ?";
@@ -250,8 +256,8 @@ public class FormCategoria extends JDialog {
 	//ELIMIANR
 	protected void do_btnEliminar_actionPerformed(ActionEvent e) {
 		// 1. Validación: Que haya un ID seleccionado
-        if (idSeleccionado == 0) {
-            JOptionPane.showMessageDialog(null, "Por favor, selecciona una categoría haciendo doble clic en la tabla.");
+        if (idSeleccionado == -1 || idSeleccionado == 0) {
+            JOptionPane.showMessageDialog(null, "Por favor, selecciona una categoría haciendo clic en la tabla.");
             return;
         }  
         // 2. Confirmación de seguridad
@@ -281,7 +287,7 @@ public class FormCategoria extends JDialog {
                     txtNombre.setText("");
                     txtDescripcion.setText("");
                     cboEstado.setSelectedIndex(0);
-                    idSeleccionado = 0; // Limpiamos el ID
+                    idSeleccionado = -1; // Limpiamos el ID
                 }
                 
             } catch (SQLException ex) {
@@ -321,8 +327,8 @@ public class FormCategoria extends JDialog {
 	//MODIFICAR 
 	protected void do_btnModificar_actionPerformed(ActionEvent e) {
 		// 1. Validación: Que haya un ID seleccionado
-        if (idSeleccionado == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione primero una fila de la tabla dando doble clic.");
+        if (idSeleccionado == -1 || idSeleccionado == 0) {
+            JOptionPane.showMessageDialog(null, "Seleccione primero una fila de la tabla dando clic.");
             return;
         }
         // 2. Captura de datos
@@ -330,7 +336,21 @@ public class FormCategoria extends JDialog {
         String descripcion = txtDescripcion.getText().trim();
         int estadoBit = (cboEstado.getSelectedIndex() == 0) ? 1 : 0;
         
-        // 3. Sentencia SQL con WHERE para el ID
+        // 3. Validación básica de vacío
+        if (nombre.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "El nombre de la categoría es obligatorio.", "Validación", JOptionPane.WARNING_MESSAGE);
+	        txtNombre.requestFocus();
+	        return;
+	    }
+        
+        // 🔥 CORRECCIÓN: Validación para que NO sea puro número ni símbolos especiales al actualizar
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+	        JOptionPane.showMessageDialog(null, "El nombre de la categoría solo puede contener letras y espacios.", "Validación", JOptionPane.WARNING_MESSAGE);
+	        txtNombre.requestFocus();
+	        return;
+	    }
+        
+        // 4. Sentencia SQL con WHERE para el ID
         String sql = "UPDATE Categoria_Producto SET nombre = ?, descripcion = ?, estado = ? WHERE id_categoria = ?";
         
         try (Connection con = Conexion.getConnection(); 
@@ -344,12 +364,12 @@ public class FormCategoria extends JDialog {
             
             if (resultado > 0) {
                 JOptionPane.showMessageDialog(null, "¡Categoría actualizada correctamente!");            
-                // 4. Refrescar y limpiar
+                // 5. Refrescar y limpiar
                 mostrarDatosEnTabla();
                 txtNombre.setText("");
                 txtDescripcion.setText("");
                 cboEstado.setSelectedIndex(0);
-                idSeleccionado = 0; // Reseteamos el ID tras modificar
+                idSeleccionado = -1; // Reseteamos el ID tras modificar
             }
             
         } catch (SQLException ex) {

@@ -148,8 +148,16 @@ public class FormRoles extends JFrame {
 	private void guardarRol() {
 		String nombre = txtNombreRol.getText().trim();
 		
+		// 1. Validación de campo vacío
 		if (nombre.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Por favor, ingrese el nombre del rol.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		// 2. CORRECCIÓN: Validación para no permitir números ni caracteres especiales
+		if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+			JOptionPane.showMessageDialog(this, "El nombre del rol solo puede contener letras y espacios.", "Formato inválida", JOptionPane.WARNING_MESSAGE);
+			txtNombreRol.requestFocus();
 			return;
 		}
 		

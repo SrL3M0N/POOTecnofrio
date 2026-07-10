@@ -71,7 +71,7 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("REGISTRO DE PRVEEDORES");
+		JLabel lblNewLabel = new JLabel("REGISTRO DE PROVEEDORES");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNewLabel.setBounds(185, 10, 207, 12);
 		contentPane.add(lblNewLabel);
@@ -84,7 +84,7 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 		lblNewLabel_1_1.setBounds(10, 76, 95, 12);
 		contentPane.add(lblNewLabel_1_1);
 		
-		JLabel lblNewLabel_2 = new JLabel("N° DE DOCUMENTO:");
+		JLabel lblNewLabel_2 = new JLabel("N° DE RUC:");
 		lblNewLabel_2.setBounds(10, 98, 113, 12);
 		contentPane.add(lblNewLabel_2);
 		
@@ -179,13 +179,26 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 			contentPane.add(scrollPane);
 			btnGuardar.addActionListener(this);
 		}
+		
+		// CORREGIDO: Bloqueo de edición manual directo en las celdas de la JTable
+		modelo = new DefaultTableModel(null, new String[]{"ID", "Razón Social", "RUC", "Teléfono", "Email", "Dirección", "Estado", "Fecha Registro"}) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		table.setModel(modelo);
+		
 		listar();
-
+		setLocationRelativeTo(null);
 	}
+	
 	ProveedorDAO dao = new ProveedorDAO();
-	DefaultTableModel modelo = new DefaultTableModel();
+	DefaultTableModel modelo;
 	private JScrollPane scrollPane;
 	private JTable table;
+	
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnBuscar) {
 			do_btnBuscar_actionPerformed(e);
@@ -199,7 +212,6 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 		if (e.getSource() == btnNuevo) {
 	        do_btnNuevo_actionPerformed(e);
 	    }
-
 	    if (e.getSource() == btnGuardar) {
 	        guardar();
 	    }
@@ -208,24 +220,12 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 	protected void do_btnNuevo_actionPerformed(ActionEvent e) {		
 	    limpiar();
 	}
+	
 	public void listar() {
-
 	    modelo.setRowCount(0);
-	    modelo.setColumnCount(0);
-
-	    modelo.addColumn("ID");
-	    modelo.addColumn("Razón Social");
-	    modelo.addColumn("RUC");
-	    modelo.addColumn("Teléfono");
-	    modelo.addColumn("Email");
-	    modelo.addColumn("Dirección");
-	    modelo.addColumn("Estado");
-	    modelo.addColumn("Fecha Registro");
-
 	    List<Proveedor> lista = dao.listarProveedor();
 
 	    for (Proveedor p : lista) {
-
 	        modelo.addRow(new Object[] {
 	            p.getId_proveedor(),
 	            p.getRazon_social(),
@@ -237,62 +237,59 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 	            p.getFecha_registro()
 	        });
 	    }
-
-	    table.setModel(modelo);
 	}
+	
 	public void limpiar() {
-
 	    txtID.setText("");
 	    txtRazonSoci.setText("");
 	    txtNumDocu.setText("");
 	    txtTelefono.setText("");
 	    txtEmail.setText("");
 	    txtDireccion.setText("");
-
 	    cmbEstado.setSelectedIndex(0);
+	    table.clearSelection();
 	}
+	
 	public void guardar() {
-
 		// 1. Razón social obligatoria
 	    if (txtRazonSoci.getText().trim().isEmpty()) {
-	        JOptionPane.showMessageDialog(this,
-	                "La razón social es obligatoria");
+	        JOptionPane.showMessageDialog(this, "La razón social es obligatoria");
 	        txtRazonSoci.requestFocus();
 	        return;
 	    }
 
 	    // 2. RUC obligatorio
 	    if (txtNumDocu.getText().trim().isEmpty()) {
-	        JOptionPane.showMessageDialog(this,
-	                "Ingrese el RUC");
+	        JOptionPane.showMessageDialog(this, "Ingrese el RUC");
 	        txtNumDocu.requestFocus();
 	        return;
 	    }
 
 	    // 3. RUC debe tener 11 dígitos
-	    if (!txtNumDocu.getText().matches("\\d{11}")) {
-	        JOptionPane.showMessageDialog(this,
-	                "El RUC debe tener 11 dígitos");
+	    if (!txtNumDocu.getText().trim().matches("\\d{11}")) {
+	        JOptionPane.showMessageDialog(this, "El RUC debe tener 11 dígitos");
 	        txtNumDocu.requestFocus();
 	        return;
 	    }
 
 	    // 4. Teléfono obligatorio
 	    if (txtTelefono.getText().trim().isEmpty()) {
-	        JOptionPane.showMessageDialog(this,
-	                "Ingrese el teléfono");
+	        JOptionPane.showMessageDialog(this, "Ingrese el teléfono");
+	        txtTelefono.requestFocus();
+	        return;
+	    }
+	    
+	    // 🔥 CORRECCIÓN: Validar que el teléfono tenga exactamente 9 números al guardar
+	    if (!txtTelefono.getText().trim().matches("\\d{9}")) {
+	        JOptionPane.showMessageDialog(this, "El teléfono debe tener exactamente 9 dígitos");
 	        txtTelefono.requestFocus();
 	        return;
 	    }
 
 	    // 5. Validar email (si se ingresó)
 	    if (!txtEmail.getText().trim().isEmpty()) {
-
-	        if (!txtEmail.getText().matches(
-	                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-
-	            JOptionPane.showMessageDialog(this,
-	                    "Correo electrónico inválido");
+	        if (!txtEmail.getText().trim().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+	            JOptionPane.showMessageDialog(this, "Correo electrónico inválido");
 	            txtEmail.requestFocus();
 	            return;
 	        }
@@ -300,21 +297,13 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 
 	    // 6. Crear objeto
 	    Proveedor p = new Proveedor();
-
-	    p.setRazon_social(txtRazonSoci.getText());
-	    p.setNum_documento(txtNumDocu.getText());
-	    p.setTelefono(txtTelefono.getText());
-	    p.setEmail(txtEmail.getText());
-	    p.setDireccion(txtDireccion.getText());
-
-	    p.setEstado(
-	            cmbEstado.getSelectedItem()
-	                     .toString()
-	                     .equals("Activo"));
-
-	    p.setFecha_registro(
-	            new java.sql.Date(
-	                    System.currentTimeMillis()));
+	    p.setRazon_social(txtRazonSoci.getText().trim());
+	    p.setNum_documento(txtNumDocu.getText().trim());
+	    p.setTelefono(txtTelefono.getText().trim());
+	    p.setEmail(txtEmail.getText().trim());
+	    p.setDireccion(txtDireccion.getText().trim());
+	    p.setEstado(cmbEstado.getSelectedItem().toString().equals("Activo"));
+	    p.setFecha_registro(new java.sql.Date(System.currentTimeMillis()));
 
 	    // 7. Guardar
 	    dao.insertar(p);
@@ -322,56 +311,45 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 	    listar();
 	    limpiar();
 	}
+	
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == table) {
 			do_table_mouseClicked(e);
 		}
 	}
-	public void mouseEntered(MouseEvent e) {
-	}
-	public void mouseExited(MouseEvent e) {
-	}
-	public void mousePressed(MouseEvent e) {
-	}
-	public void mouseReleased(MouseEvent e) {
-	}
+	public void mouseEntered(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	
 	protected void do_table_mouseClicked(MouseEvent e) {
 		seleccionarFila();
 	}
+	
 	public void seleccionarFila() {
 	    int fila = table.getSelectedRow();
 	    if (fila == -1) {
 	        return;
 	    }
-	    txtID.setText(
-	            table.getValueAt(fila, 0).toString());
-	    txtRazonSoci.setText(
-	            table.getValueAt(fila, 1).toString());
-	    txtNumDocu.setText(
-	            table.getValueAt(fila, 2).toString());
-	    txtTelefono.setText(
-	            table.getValueAt(fila, 3).toString());
-	    txtEmail.setText(
-	            table.getValueAt(fila, 4).toString());
-	    txtDireccion.setText(
-	            table.getValueAt(fila, 5).toString());
-	    cmbEstado.setSelectedItem(
-	            table.getValueAt(fila, 6).toString());
+	    txtID.setText(table.getValueAt(fila, 0).toString());
+	    txtRazonSoci.setText(table.getValueAt(fila, 1).toString());
+	    txtNumDocu.setText(table.getValueAt(fila, 2).toString());
+	    txtTelefono.setText(table.getValueAt(fila, 3).toString());
+	    txtEmail.setText(table.getValueAt(fila, 4) != null ? table.getValueAt(fila, 4).toString() : "");
+	    txtDireccion.setText(table.getValueAt(fila, 5) != null ? table.getValueAt(fila, 5).toString() : "");
+	    cmbEstado.setSelectedItem(table.getValueAt(fila, 6).toString());
 	}
+	
 	protected void do_btnEditar_actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnNuevo) {
-	        limpiar();
-	    }
-
-	    else if (e.getSource() == btnGuardar) {
-	        guardar();
-	    }
-
-	    else if (e.getSource() == btnEditar) {
-	        editar();
-	    }
+		editar();
 	}
+	
 	public void editar() {
+		if (txtID.getText().trim().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Seleccione un proveedor de la tabla para editar");
+			return;
+		}
+		
 		if (txtRazonSoci.getText().trim().isEmpty()) {
 		    JOptionPane.showMessageDialog(this, "La razón social es obligatoria");
 		    txtRazonSoci.requestFocus();
@@ -384,7 +362,7 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 		    return;
 		}
 
-		if (!txtNumDocu.getText().matches("\\d{11}")) {
+		if (!txtNumDocu.getText().trim().matches("\\d{11}")) {
 		    JOptionPane.showMessageDialog(this, "El RUC debe tener 11 dígitos");
 		    txtNumDocu.requestFocus();
 		    return;
@@ -396,29 +374,20 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 		    return;
 		}
 
-		if (!txtTelefono.getText().matches("\\d{9}")) {
+		if (!txtTelefono.getText().trim().matches("\\d{9}")) {
 		    JOptionPane.showMessageDialog(this, "El teléfono debe tener 9 dígitos");
 		    txtTelefono.requestFocus();
 		    return;
 		}
 
-		if (txtEmail.getText().trim().isEmpty()) {
-		    JOptionPane.showMessageDialog(this, "Ingrese el correo");
-		    txtEmail.requestFocus();
-		    return;
+		if (!txtEmail.getText().trim().isEmpty()) {
+			if (!txtEmail.getText().trim().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+			    JOptionPane.showMessageDialog(this, "Correo electrónico inválido");
+			    txtEmail.requestFocus();
+			    return;
+			}
 		}
 
-		if (!txtEmail.getText().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-		    JOptionPane.showMessageDialog(this, "Correo electrónico inválido");
-		    txtEmail.requestFocus();
-		    return;
-		}
-
-		if (txtDireccion.getText().trim().isEmpty()) {
-		    JOptionPane.showMessageDialog(this, "Ingrese la dirección");
-		    txtDireccion.requestFocus();
-		    return;
-		}
 		int op = JOptionPane.showConfirmDialog(
 	            this,
 	            "¿Desea actualizar este proveedor?",
@@ -430,124 +399,65 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 	    }
 
 	    Proveedor p = new Proveedor();
-
-	    p.setId_proveedor(Integer.parseInt(txtID.getText()));
-
-	    p.setRazon_social(txtRazonSoci.getText());
-	    p.setNum_documento(txtNumDocu.getText());
-	    p.setTelefono(txtTelefono.getText());
-	    p.setEmail(txtEmail.getText());
-	    p.setDireccion(txtDireccion.getText());
-
-	    p.setEstado(
-	            cmbEstado.getSelectedItem().toString().equals("Activo"));
+	    p.setId_proveedor(Integer.parseInt(txtID.getText().trim()));
+	    p.setRazon_social(txtRazonSoci.getText().trim());
+	    p.setNum_documento(txtNumDocu.getText().trim());
+	    p.setTelefono(txtTelefono.getText().trim());
+	    p.setEmail(txtEmail.getText().trim());
+	    p.setDireccion(txtDireccion.getText().trim());
+	    p.setEstado(cmbEstado.getSelectedItem().toString().equals("Activo"));
 
 	    dao.editar(p);
 
-	    JOptionPane.showMessageDialog(
-	            this,
-	            "Proveedor actualizado correctamente.");
+	    JOptionPane.showMessageDialog(this, "Proveedor actualizado correctamente.");
 
 	    listar();
 	    limpiar();
 	}
+	
 	protected void do_btnEliminar_actionPerformed(ActionEvent e) {
-		if (txtID.getText().trim().isEmpty()) {
-
-	        JOptionPane.showMessageDialog(
-	                this,
-	                "Seleccione un proveedor");
-
-	        return;
-	    }
-
-	    int op =
-	            JOptionPane.showConfirmDialog(
-	                    this,
-	                    "¿Eliminar proveedor?",
-	                    "Confirmar",
-	                    JOptionPane.YES_NO_OPTION);
-	    
-
-	    if (op ==
-	            JOptionPane.YES_OPTION) {
-
-	        dao.eliminar(
-	                Integer.parseInt(
-	                        txtID.getText()));
-
-	        listar();
-	        limpiar();
-	    }
-		
+		eliminar();
 	}
 
 	public void eliminar() {
-
 	    if (txtID.getText().trim().isEmpty()) {
-
-	        JOptionPane.showMessageDialog(
-	                this,
-	                "Seleccione un proveedor");
-
+	        JOptionPane.showMessageDialog(this, "Seleccione un proveedor");
 	        return;
 	    }
 
-	    int op =
-	            JOptionPane.showConfirmDialog(
+	    int op = JOptionPane.showConfirmDialog(
 	                    this,
 	                    "¿Eliminar proveedor?",
 	                    "Confirmar",
 	                    JOptionPane.YES_NO_OPTION);
 
-	    if (op ==
-	            JOptionPane.YES_OPTION) {
-
-	        dao.eliminar(
-	                Integer.parseInt(
-	                        txtID.getText()));
-
+	    if (op == JOptionPane.YES_OPTION) {
+	        dao.eliminar(Integer.parseInt(txtID.getText().trim()));
 	        listar();
 	        limpiar();
 	    }
 	}
+	
 	public void buscar() {
 	    if (txtID.getText().trim().isEmpty()) {
-	        JOptionPane.showMessageDialog(
-	                this,
-	                "Ingrese el ID del proveedor");
+	        JOptionPane.showMessageDialog(this, "Ingrese el ID del proveedor");
 	        return;
 	    }
 	    try {
-	        int id =
-	                Integer.parseInt(
-	                        txtID.getText());
-	        Proveedor p =
-	                dao.buscar(id);
+	        int id = Integer.parseInt(txtID.getText().trim());
+	        Proveedor p = dao.buscar(id);
 	        if (p != null) {
-	            txtRazonSoci.setText(
-	                    p.getRazon_social());
-	            txtNumDocu.setText(
-	                    p.getNum_documento());
-	            txtTelefono.setText(
-	                    p.getTelefono());
-	            txtEmail.setText(
-	                    p.getEmail());
-	            txtDireccion.setText(
-	                    p.getDireccion());
-	            cmbEstado.setSelectedItem(
-	                    p.isEstado()
-	                    ? "Activo"
-	                    : "Inactivo");
+	            txtRazonSoci.setText(p.getRazon_social());
+	            txtNumDocu.setText(p.getNum_documento());
+	            txtTelefono.setText(p.getTelefono());
+	            txtEmail.setText(p.getEmail());
+	            txtDireccion.setText(p.getDireccion());
+	            cmbEstado.setSelectedItem(p.isEstado() ? "Activo" : "Inactivo");
 	        } else {
-	            JOptionPane.showMessageDialog(
-	                    this,
-	                    "Proveedor no encontrado");
+	            JOptionPane.showMessageDialog(this, "Proveedor no encontrado");
 	        }
 	    } catch(Exception e) {
-	        JOptionPane.showMessageDialog(
-	                this,
-	                e.getMessage());
+	        JOptionPane.showMessageDialog(this, e.getMessage());
 	    }
 	}
 	
@@ -555,5 +465,3 @@ public class FormProveedor extends JFrame implements ActionListener, MouseListen
 		buscar();
 	}
 }
-
-

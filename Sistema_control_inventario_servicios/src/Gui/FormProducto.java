@@ -353,8 +353,8 @@ public class FormProducto extends JDialog {
 	
 		
 		// 1. Validaciones básicas de campos vacíos
-	    if(txtProducto.getText().isEmpty() || txtCosto.getText().isEmpty() || txtProveedor.getText().isEmpty()) {
-	        JOptionPane.showMessageDialog(this, "Debe completar todos los campos, incluyendo el proveedor");
+	    if(txtProducto.getText().isEmpty() || txtCosto.getText().isEmpty() || txtProveedor.getText().isEmpty() || txtStock.getText().trim().isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "Debe completar todos los campos, incluyendo el proveedor y stock.");
 	        return;
 	    }
 	    // 2. FILTRO CRÍTICO: Validar que se haya seleccionado un proveedor real
@@ -400,11 +400,24 @@ public class FormProducto extends JDialog {
 	        return;
 	    }
 	    
-	 // Validar que el stock sea un número entero
+		// Validar que el stock sea un número entero
 	    if (!txtStock.getText().trim().matches("\\d+")) {
 	        JOptionPane.showMessageDialog(
 	            this,
-	            "El stock inicial solo puede contener números.",
+	            "El stock inicial solo puede contener números enteros.",
+	            "Validación",
+	            JOptionPane.WARNING_MESSAGE
+	        );
+	        txtStock.requestFocus();
+	        return;
+	    }
+	    
+	    // 🔥 CORRECCIÓN: Validar que el stock sea estrictamente mayor que 0
+	    int stockVal = Integer.parseInt(txtStock.getText().trim());
+	    if (stockVal <= 0) {
+	        JOptionPane.showMessageDialog(
+	            this,
+	            "El stock inicial debe ser un valor mayor que 0.",
 	            "Validación",
 	            JOptionPane.WARNING_MESSAGE
 	        );
@@ -420,7 +433,7 @@ public class FormProducto extends JDialog {
 	    p.setCodigoBarras(txtCodBarras.getText());
 	    p.setCosto(Double.parseDouble(txtCosto.getText()));
 	    p.setPrecioVenta(Double.parseDouble(txtPrecioVenta.getText()));
-	    p.setStock(Integer.parseInt(txtStock.getText()));
+	    p.setStock(stockVal);
 	    
 	    // 3. Extraer IDs (Lo más importante)
 	    // Para la Categoría, extraemos el ID del objeto seleccionado en el JComboBox
@@ -583,6 +596,18 @@ public class FormProducto extends JDialog {
 	        txtPrecioVenta.requestFocus();
 	        return;
 	    }
+	    
+	    // 🔥 CORRECCIÓN: Validar que el stock modificado sea mayor que 0 (Especialmente preventivo si hereda datos)
+	    int stockVal = Integer.parseInt(txtStock.getText().trim());
+	    if (stockVal <= 0) {
+	        JOptionPane.showMessageDialog(
+	            this,
+	            "El stock no puede ser igual o menor a 0.",
+	            "Validación",
+	            JOptionPane.WARNING_MESSAGE
+	        );
+	        return;
+	    }
 
 
 	    // 2. Crear objeto con los datos del formulario
@@ -593,7 +618,7 @@ public class FormProducto extends JDialog {
 	    p.setCodigoBarras(txtCodBarras.getText());
 	    p.setCosto(Double.parseDouble(txtCosto.getText()));
 	    p.setPrecioVenta(Double.parseDouble(txtPrecioVenta.getText()));
-	    p.setStock(Integer.parseInt(txtStock.getText()));
+	    p.setStock(stockVal);
 	    
 	    // Categoría y Proveedor
 	    CboCategoria cat = (CboCategoria) cboCategoria.getSelectedItem();
