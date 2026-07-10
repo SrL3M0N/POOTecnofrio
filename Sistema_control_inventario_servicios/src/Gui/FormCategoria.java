@@ -157,6 +157,9 @@ public class FormCategoria extends JDialog {
 	
 	//GUARDAR
 	protected void do_btnNewButton_actionPerformed(ActionEvent e) {
+		
+		
+		
 		String nombre = txtNombre.getText().trim();
 	    String descripcion = txtDescripcion.getText().trim();
 	    int estadoBit = (cboEstado.getSelectedIndex() == 0) ? 1 : 0;
@@ -174,6 +177,7 @@ public class FormCategoria extends JDialog {
 	        txtNombre.requestFocus();
 	        return;
 	    }
+	    
 	    
 	    // 2. Verificación de duplicados
 	    String sqlVerificar = "SELECT COUNT(*) FROM Categoria_Producto WHERE nombre = ?";

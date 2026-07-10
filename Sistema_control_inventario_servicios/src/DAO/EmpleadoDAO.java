@@ -1,9 +1,6 @@
 package DAO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,58 +8,178 @@ import Clases.Conexion;
 import Clases.Empleado;
 
 public class EmpleadoDAO {
-	/*
-//MODAL
-	public List<Empleado> listarEmpleadosConDetalle() {
-	    List<Empleado> lista = new ArrayList<>();
-	    // Ajusta los nombres de tabla 'TipoEmpleado' y 'Disponibilidad' según tu BD real
-	    String sql = "SELECT e.id_empleado, e.nombres, t.nombre AS tipo, d.nombre_estado AS disp " +
-	                 "FROM Empleado e " +
-	                 "LEFT JOIN TipoEmpleado t ON e.id_tipo_empleado = t.id_tipo_empleado " +
-	                 "LEFT JOIN EstadoDisponibilidad d ON e.id_disponibilidad = d.id_disponibilidad";
-	    
-	    try (Connection con = Conexion.getConnection();
-	         PreparedStatement ps = con.prepareStatement(sql);
-	         ResultSet rs = ps.executeQuery()) {
-	        
-	        while (rs.next()) {
-	            Empleado e = new Empleado();
-	            e.setIdEmpleado(rs.getInt("id_empleado"));
-	            e.setNombres(rs.getString("nombres"));
-	            e.setNombreTipo(rs.getString("tipo"));
-	            e.setNombreDisp(rs.getString("disp"));
-	            lista.add(e);
-	        }
-	    } catch (SQLException e) { e.printStackTrace(); }
-	    return lista;
-	}
-*/
-	
 
-	public List<Empleado> listarEmpleadosConDetalle() {
-	    List<Empleado> lista = new ArrayList<>();
+    // INSERTAR
+    public boolean insertar(Empleado emp) {
 
-	    String sql = "SELECT id_empleado, nombres, documento, telefono FROM Empleado";
+    	String sql = "INSERT INTO Empleado(nombres, documento, telefono) VALUES(?,?,?)";
 
-	    try (Connection con = Conexion.getConnection();
-	         PreparedStatement ps = con.prepareStatement(sql);
-	         ResultSet rs = ps.executeQuery()) {
+        try (Connection con = Conexion.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-	        while (rs.next()) {
-	            Empleado e = new Empleado();
-	            e.setIdEmpleado(rs.getInt("id_empleado"));
-	            e.setNombres(rs.getString("nombres"));
-	            e.setDocumento(rs.getString("documento"));
-	            e.setTelefono(rs.getString("telefono"));
+            ps.setString(1, emp.getNombres());
+            ps.setString(2, emp.getDocumento());
+            ps.setString(3, emp.getTelefono());
 
-	            lista.add(e);
-	        }
+            return ps.executeUpdate() > 0;
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-	    return lista;
-	}
+        return false;
+    }
+
+    // LISTAR
+    public List<Empleado> listar(){
+
+        List<Empleado> lista = new ArrayList<>();
+
+        String sql="SELECT * FROM Empleado";
+
+        try(Connection con=Conexion.getConnection();
+            PreparedStatement ps=con.prepareStatement(sql);
+            ResultSet rs=ps.executeQuery()){
+
+            while(rs.next()){
+
+                Empleado emp=new Empleado();
+
+                emp.setIdEmpleado(rs.getInt("id_empleado"));
+                emp.setNombres(rs.getString("nombres"));
+                emp.setDocumento(rs.getString("documento"));
+                emp.setTelefono(rs.getString("telefono"));
+
+                lista.add(emp);
+            }
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    // BUSCAR
+    public Empleado buscar(int id){
+
+        String sql="SELECT * FROM Empleado WHERE id_empleado=?";
+
+        try(Connection con=Conexion.getConnection();
+            PreparedStatement ps=con.prepareStatement(sql)){
+
+            ps.setInt(1,id);
+
+            ResultSet rs=ps.executeQuery();
+
+            if(rs.next()){
+
+                Empleado emp=new Empleado();
+
+                emp.setIdEmpleado(rs.getInt("id_empleado"));
+                emp.setNombres(rs.getString("nombres"));
+                emp.setDocumento(rs.getString("documento"));
+                emp.setTelefono(rs.getString("telefono"));
+
+                return emp;
+
+            }
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // ACTUALIZAR
+    public boolean actualizar(Empleado emp){
+
+        String sql="UPDATE Empleado SET nombres=?,documento=?,telefono=? WHERE id_empleado=?";
+
+        try(Connection con=Conexion.getConnection();
+            PreparedStatement ps=con.prepareStatement(sql)){
+
+            ps.setString(1, emp.getNombres());
+            ps.setString(2, emp.getDocumento());
+            ps.setString(3, emp.getTelefono());
+            ps.setInt(4, emp.getIdEmpleado());
+
+            return ps.executeUpdate()>0;
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // ELIMINAR
+    public boolean eliminar(int id){
+
+    	 String verificar =
+    			    "SELECT COUNT(*) FROM Usuario WHERE id_empleado=?";
+
+
+    			    String eliminar =
+    			    "DELETE FROM Empleado WHERE id_empleado=?";
+
+
+    			    try(Connection con = Conexion.getConnection()){
+
+
+    			        PreparedStatement ps1 = con.prepareStatement(verificar);
+
+    			        ps1.setInt(1,id);
+
+    			        ResultSet rs = ps1.executeQuery();
+
+
+    			        if(rs.next() && rs.getInt(1)>0){
+
+    			            return false;
+    			        }
+
+
+    			        PreparedStatement ps2 = con.prepareStatement(eliminar);
+
+    			        ps2.setInt(1,id);
+
+
+    			        return ps2.executeUpdate()>0;
+
+
+
+    			    }catch(SQLException e){
+
+    			        e.printStackTrace();
+
+    			    }
+
+
+    			    return false;
+    }
+    
+    public boolean existeDocumento(String documento) {
+
+        String sql = "SELECT COUNT(*) FROM Empleado WHERE documento = ?";
+
+        try (Connection cn = Conexion.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+
+            ps.setString(1, documento);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
 }

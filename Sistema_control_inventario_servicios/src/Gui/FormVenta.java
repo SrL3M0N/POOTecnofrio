@@ -67,7 +67,6 @@ public class FormVenta extends JFrame {
 	private JLabel lblCdigoVenta;
 	private JTextField txtTotal;
 	private JLabel lblTotal;
-	private JButton btnCancelar;
 	private JButton btnBuscarItem;
 	private JLabel lblSubtotal;
 	private JTextField txtSubtotal;
@@ -324,11 +323,6 @@ public class FormVenta extends JFrame {
 			lblTotal = new JLabel("TOTAL");
 			lblTotal.setBounds(711, 408, 101, 14);
 			contentPane.add(lblTotal);
-		}
-		{
-			btnCancelar = new JButton("Cancelar");
-			btnCancelar.setBounds(714, 508, 98, 23);
-			contentPane.add(btnCancelar);
 		}
 		{
 			lblSubtotal = new JLabel("SUBTOTAL");

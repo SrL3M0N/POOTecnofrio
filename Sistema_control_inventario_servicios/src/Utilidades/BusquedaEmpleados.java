@@ -12,8 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import Clases.Empleado;
-import DAO.EmpleadoDAO;
+import Clases.Empleado2;
+import DAO.EmpleadoDAO2;
 import Gui.FormProducto;
 import Gui.FormServicio;
 import javax.swing.JTable;
@@ -96,13 +96,13 @@ public class BusquedaEmpleados extends JDialog {
 	}
 	
 	private void cargarTablaEmpleados() {
-	    EmpleadoDAO dao = new EmpleadoDAO();
-	    List<Empleado> lista = dao.listarEmpleadosConDetalle(); // Usamos tu método funcional
+	    EmpleadoDAO2 dao = new EmpleadoDAO2();
+	    List<Empleado2> lista = dao.listarEmpleadosConDetalle(); // Usamos tu método funcional
 	    
 	    DefaultTableModel model = (DefaultTableModel) table.getModel();
 	    model.setRowCount(0); // Limpiar datos previos
 	    
-	    for (Empleado e : lista) {
+	    for (Empleado2 e : lista) {
 	        model.addRow(new Object[]{
 	            e.getIdEmpleado(),   // Columna 0 (ID)
 	            e.getNombres(),      // Columna 1

@@ -22,7 +22,7 @@ public class Conexion {
                     + "trustServerCertificate=true;";
 
             	String usuario = "sa";
-            	String password = "123456";	
+            	String password = "100595";	
 
             cn = DriverManager.getConnection(
                     url,

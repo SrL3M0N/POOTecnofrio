@@ -199,6 +199,12 @@ public class Form_principal extends JFrame {
 			}
 			{
 				menuEmpleados = new JMenu("Empleados");
+				menuEmpleados.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						do_menuEmpleados_mouseClicked(e);
+					}
+				});
 				menuEmpleados.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 				menuBar.add(menuEmpleados);
 			}
@@ -381,5 +387,9 @@ public class Form_principal extends JFrame {
 	protected void do_mntmNewMenuItem_8_actionPerformed(ActionEvent e) {
 		Gui.FormReporteProductosMasVendidos prov = new FormReporteProductosMasVendidos();
 		prov.setVisible(true);
+	}
+	protected void do_menuEmpleados_mouseClicked(MouseEvent e) {
+		Gui.FomrEmpleado emp = new FomrEmpleado();
+		emp.setVisible(true);
 	}
 }

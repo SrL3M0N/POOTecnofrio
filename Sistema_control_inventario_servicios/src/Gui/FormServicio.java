@@ -260,6 +260,19 @@ public class FormServicio extends JFrame {
 	
 	//GUARDAR
 	protected void do_btnNewButton_actionPerformed(ActionEvent e) {
+		   ServicioDAO dao = new ServicioDAO();
+		if (dao.existeServicio(txtServicio.getText().trim())) {
+
+		    JOptionPane.showMessageDialog(this,
+		            "Ya existe un servicio con ese nombre.");
+
+		    txtServicio.requestFocus();
+		    txtServicio.selectAll();
+		    return;
+		}
+		
+		
+		
 		if (!txtServicio.getText().matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
 		    JOptionPane.showMessageDialog(this, "El nombre del servicio solo puede contener letras y espacios.");
 		    txtServicio.requestFocus();
@@ -272,16 +285,39 @@ public class FormServicio extends JFrame {
 	        JOptionPane.showMessageDialog(this, "Por favor, complete los campos obligatorios.");
 	        return;
 	    }
+	    
+	    String precio = txtPrecio.getText().trim();
+
+	    if (precio.isEmpty()) {
+	        JOptionPane.showMessageDialog(this,
+	                "Ingrese el precio.",
+	                "Validación",
+	                JOptionPane.WARNING_MESSAGE);
+	        txtPrecio.requestFocus();
+	        return;
+	    }
+	    
+	 // Solo números enteros o decimales
+	    if (!precio.matches("\\d+(\\.\\d{1,2})?")) {
+	        JOptionPane.showMessageDialog(this,
+	                "El precio solo puede contener números.",
+	                "Validación",
+	                JOptionPane.WARNING_MESSAGE);
+	        txtPrecio.requestFocus();
+	        txtPrecio.selectAll();
+	        return;
+	    }
 	 // 1. Obtener valores
 	    String nombre = txtServicio.getText().trim();
 	    String desc = txtDescripcion.getText().trim();
-	    
+	    /*
 	    // 2. Validación de duplicados
 	    ServicioDAO dao = new ServicioDAO();
 	    if (dao.existeServicio(nombre, desc)) {
 	        JOptionPane.showMessageDialog(this, "El servicio '" + nombre + "' ya existe en el sistema.");
 	        return; // Detiene la ejecución
-	    }
+	    }*/
+	    
 	    
 	    if (!txtPrecio.getText().matches("\\d+(\\.\\d{1,2})?")) {
 	        JOptionPane.showMessageDialog(this, "El precio debe contener solo números.");
@@ -323,6 +359,18 @@ public class FormServicio extends JFrame {
 	
 	//MODIFICAR UN EL SERVICIO
 	protected void do_btnModificar_actionPerformed(ActionEvent e) {
+		String precio = txtPrecio.getText().trim();
+		 // Solo números enteros o decimales
+	    if (!precio.matches("\\d+(\\.\\d{1,2})?")) {
+	        JOptionPane.showMessageDialog(this,
+	                "El precio solo puede contener números.",
+	                "Validación",
+	                JOptionPane.WARNING_MESSAGE);
+	        txtPrecio.requestFocus();
+	        txtPrecio.selectAll();
+	        return;
+	    }
+		
 		// Validar que se haya seleccionado un ítem
 	    if (this.idServicioSeleccionado == 0) {
 	        JOptionPane.showMessageDialog(this, "Seleccione un servicio de la tabla para modificar.");

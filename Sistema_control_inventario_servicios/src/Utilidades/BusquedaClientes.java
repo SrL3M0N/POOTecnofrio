@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
 
 import Clases.Cliente;
 import DAO.ClienteDAO;
-import DAO.EmpleadoDAO;
+import DAO.EmpleadoDAO2;
 import Gui.FormServicio;
 import Gui.FormVenta;
 

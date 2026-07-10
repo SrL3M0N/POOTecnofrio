@@ -7,11 +7,8 @@ public class Empleado {
     private String documento;
     private String email;
     private String telefono;
-    private int idTipoEmpleado;
-    private int idDisponibilidad;
-    
-    private String nombreTipo; // Nuevo: para mostrar "Técnico" en vez de ID 1
-    private String nombreDisp; // Nuevo: para mostrar "Disponible" en vez de ID 2
+  
+   
     
 	public Empleado() {
 		
@@ -25,10 +22,7 @@ public class Empleado {
 		this.documento = documento;
 		this.email = email;
 		this.telefono = telefono;
-		this.idTipoEmpleado = idTipoEmpleado;
-		this.idDisponibilidad = idDisponibilidad;
-		this.nombreTipo = nombreTipo;
-		this.nombreDisp = nombreDisp;
+
 	}
 
 	public int getIdEmpleado() {
@@ -71,39 +65,4 @@ public class Empleado {
 		this.telefono = telefono;
 	}
 
-	public int getIdTipoEmpleado() {
-		return idTipoEmpleado;
-	}
-
-	public void setIdTipoEmpleado(int idTipoEmpleado) {
-		this.idTipoEmpleado = idTipoEmpleado;
-	}
-
-	public int getIdDisponibilidad() {
-		return idDisponibilidad;
-	}
-
-	public void setIdDisponibilidad(int idDisponibilidad) {
-		this.idDisponibilidad = idDisponibilidad;
-	}
-
-	public String getNombreTipo() {
-		return nombreTipo;
-	}
-
-	public void setNombreTipo(String nombreTipo) {
-		this.nombreTipo = nombreTipo;
-	}
-
-	public String getNombreDisp() {
-		return nombreDisp;
-	}
-	public void setNombreDisp(String nombreDisp) {
-		this.nombreDisp = nombreDisp;
-	}
-
-	@Override
-	public String toString() {
-	    return nombres;
-	}
 }

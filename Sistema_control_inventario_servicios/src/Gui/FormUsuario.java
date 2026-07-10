@@ -31,7 +31,7 @@ public class FormUsuario extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JTextField txtUsaurio;
 	private JPasswordField txtContrasena; // Cambiado de JTextField a JPasswordField
-	private JComboBox<Clases.Empleado> cboEmpleado;
+	private JComboBox<Clases.Empleado2> cboEmpleado;
 	
 	private JTable tableUsuarios;
 	private JComboBox<String> cboEstado;
@@ -194,13 +194,13 @@ public class FormUsuario extends JFrame {
 		lblEmpleado.setBounds(21, 151, 80, 14);
 		contentPane.add(lblEmpleado);
 		
-		cboEmpleado = new JComboBox<Clases.Empleado>();
+		cboEmpleado = new JComboBox<Clases.Empleado2>();
 		cboEmpleado.setBounds(107, 147, 154, 22); 
 		contentPane.add(cboEmpleado);
 
 		cboEmpleado.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Clases.Empleado empSeleccionado = (Clases.Empleado) cboEmpleado.getSelectedItem();
+				Clases.Empleado2 empSeleccionado = (Clases.Empleado2) cboEmpleado.getSelectedItem();
 				if (empSeleccionado != null) {
 					idEmpleadoSeleccionado = empSeleccionado.getIdEmpleado();
 				}
@@ -238,9 +238,9 @@ public class FormUsuario extends JFrame {
 
 	private void cargarEmpleados() {
 		cboEmpleado.removeAllItems(); 
-		DAO.EmpleadoDAO dao = new DAO.EmpleadoDAO();
-		List<Clases.Empleado> lista = dao.listarEmpleadosConDetalle(); 
-		for (Clases.Empleado e : lista) {
+		DAO.EmpleadoDAO2 dao = new DAO.EmpleadoDAO2();
+		List<Clases.Empleado2> lista = dao.listarEmpleadosConDetalle(); 
+		for (Clases.Empleado2 e : lista) {
 			cboEmpleado.addItem(e); 
 		}
 	}

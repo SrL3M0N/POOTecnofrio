@@ -169,5 +169,27 @@ public class ServicioDAO {
 	        return false;
 	    }
 	}
+	
+	public boolean existeServicio(String nombre) {
+
+	    String sql = "SELECT COUNT(*) FROM Item WHERE nombre = ? AND tipo = 'SERVICIO'";
+
+	    try (Connection cn = Conexion.getConnection();
+	         PreparedStatement ps = cn.prepareStatement(sql)) {
+
+	        ps.setString(1, nombre);
+
+	        ResultSet rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            return rs.getInt(1) > 0;
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return false;
+	}
 
 }
