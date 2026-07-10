@@ -80,37 +80,33 @@ public class ItemDAO {
 	}
 
 	public List<Item> listarTodos(){
-
 	    List<Item> lista = new ArrayList<>();
 
+	    // Modificamos el SQL para asegurarnos de que si es un SERVICIO, esté ACTIVO (s.activo = 1)
 	    String sql =
 	    "SELECT i.id_item, i.nombre, i.precioVenta, i.tipo, p.stock " +
 	    "FROM Item i " +
-	    "LEFT JOIN Producto p ON p.id_item = i.id_item";
+	    "LEFT JOIN Producto p ON p.id_item = i.id_item " +
+	    "LEFT JOIN Servicio s ON s.id_item = i.id_item " +
+	    "WHERE i.tipo = 'PRODUCTO' OR (i.tipo = 'SERVICIO' AND s.activo = 1)";
 
 	    try(Connection cn = Conexion.getConnection();
 	        PreparedStatement ps = cn.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery()){
 
 	        while(rs.next()){
-
 	            Item item = new Item();
-
 	            item.setIdItem(rs.getInt("id_item"));
 	            item.setNombre(rs.getString("nombre"));
 	            item.setPrecio(rs.getDouble("precioVenta"));
 	            item.setTipo(rs.getString("tipo"));
-
-	            // SOLO productos tendrán stock
 	            item.setStock(rs.getInt("stock"));
 
 	            lista.add(item);
 	        }
-
-	    }catch(Exception e){
+	    } catch(Exception e){
 	        System.out.println(e.getMessage());
 	    }
-
 	    return lista;
 	}
 

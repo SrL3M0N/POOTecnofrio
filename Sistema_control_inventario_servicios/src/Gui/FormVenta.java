@@ -451,9 +451,10 @@ public class FormVenta extends JFrame {
 	        }
 	        
 	        Venta v = new Venta();
-	        v.setSubtotal(Double.parseDouble(txtSubtotal.getText()));
-	        v.setIgv(Double.parseDouble(txtIGV.getText()));
-	        v.setTotal(Double.parseDouble(txtTotal.getText()));
+	     // Ahora txtSubtotal.getText() tendrá "150.00" y parseDouble funcionará sin caídas
+		    v.setSubtotal(Double.parseDouble(txtSubtotal.getText()));
+		    v.setIgv(Double.parseDouble(txtIGV.getText()));
+		    v.setTotal(Double.parseDouble(txtTotal.getText()));
 	        v.setIdCliente(idClienteSeleccionado);
 	        v.setIdUsuario(Sesion.idUsuario);
 	        v.setNumeroComprobante(txtNumeroComprobante.getText());
@@ -631,7 +632,8 @@ public class FormVenta extends JFrame {
 
 	        double importe = cantidad * precio;
 
-	        txtImporte.setText(String.format("%.2f", importe));
+	        // 🔥 CORRECCIÓN: Forzamos el uso de Locale.US para que use punto (.) en vez de coma (,)
+	        txtImporte.setText(String.format(java.util.Locale.US, "%.2f", importe));
 
 	    } catch (NumberFormatException e) {
 	        txtImporte.setText("0.00");
@@ -647,7 +649,6 @@ public class FormVenta extends JFrame {
 	    double subtotal = 0;
 
 	    for (int i = 0; i < modelo.getRowCount(); i++) {
-
 	        int cantidad = Integer.parseInt(modelo.getValueAt(i, 2).toString());
 	        double precio = Double.parseDouble(modelo.getValueAt(i, 3).toString());
 
@@ -657,9 +658,10 @@ public class FormVenta extends JFrame {
 	    double igv = subtotal * 0.18;
 	    double total = subtotal + igv;
 
-	    txtSubtotal.setText(String.format("%.2f", subtotal));
-	    txtIGV.setText(String.format("%.2f", igv));
-	    txtTotal.setText(String.format("%.2f", total));
+	    // 🔥 CORRECCIÓN: Forzamos Locale.US en todos los totales de la interfaz gráfica
+	    txtSubtotal.setText(String.format(java.util.Locale.US, "%.2f", subtotal));
+	    txtIGV.setText(String.format(java.util.Locale.US, "%.2f", igv));
+	    txtTotal.setText(String.format(java.util.Locale.US, "%.2f", total));
 	}
 	
 	public int obtenerCantidadReservada(int idProducto) {
