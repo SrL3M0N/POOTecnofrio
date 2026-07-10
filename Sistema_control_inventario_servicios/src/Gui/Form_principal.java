@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 
 public class Form_principal extends JFrame {
 
@@ -54,6 +55,7 @@ public class Form_principal extends JFrame {
 	private JMenuItem mntmNewMenuItem_3;
 	private JMenuItem mntmNewMenuItem_5;
 	private JMenuItem mntmNewMenuItem_8;
+	private JButton btnNewButton;
 
 	/**
 	 * Launch the application.
@@ -277,6 +279,18 @@ public class Form_principal extends JFrame {
 			lblNewLabel.setBounds(37, 11, 223, 148);
 			contentPane.add(lblNewLabel);
 		}
+		{
+			btnNewButton = new JButton("Creditos");
+			// CORREGIDO: Se enlaza el evento al botón físico de Créditos
+			btnNewButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					do_btnNewButton_actionPerformed(e);
+				}
+			});
+			btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 13));
+			btnNewButton.setBounds(681, 272, 89, 37);
+			contentPane.add(btnNewButton);
+		}
 		
 		// VALIDACIÓN DE SEGURIDAD POR ROL
 		if ("Vendedor".equalsIgnoreCase(Sesion.rol)) {
@@ -290,6 +304,13 @@ public class Form_principal extends JFrame {
 	// =========================================================================
 	// MÉTODOS DE ACCIÓN (EVENTOS DE BOTONES Y MENÚS)
 	// =========================================================================
+
+	// AGREGADO: Disparador del botón de créditos
+	protected void do_btnNewButton_actionPerformed(ActionEvent e) {
+		Form_Creditos cred = new Form_Creditos();
+		cred.setLocationRelativeTo(this);
+		cred.setVisible(true);
+	}
 
 	// USUARIOS
 	protected void do_mntmNewMenuItem_6_actionPerformed(ActionEvent e) {
